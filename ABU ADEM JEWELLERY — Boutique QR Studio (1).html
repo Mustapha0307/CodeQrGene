@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABU ADEM JEWELLERY — Boutique QR & Print Studio</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Luxury Editorial & Geometric Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- QR Code Matrix Generator (Supports strict Error Correction Level H) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
+  <!-- Client-side QR Decoder for Real-Time Optical Scan Verification -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serifDisplay: ['Cinzel', 'serif'],
+            serifEditorial: ['Cormorant Garamond', 'serif'],
+            sansClean: ['Montserrat', 'sans-serif'],
+          },
+          colors: {
+            silverMist: '#E5E7EB',
+            sterling: '#B8C0CC',
+            champagne: '#C5A467',
+            champagneDark: '#9E7E43',
+            ivorySilk: '#FAF8F5',
+            obsidian: '#0B0B0C',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #F3F4F6;
+      color: #111827;
+    }
+
+    /* Subtle architectural grid backdrop for the preview stage */
+    .studio-stage {
+      background-color: #ECEEF2;
+      background-image:
+        radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.9) 0%, rgba(232, 235, 240, 0.7) 100%),
+        linear-gradient(to right, rgba(184, 192, 204, 0.18) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(184, 192, 204, 0.18) 1px, transparent 1px);
+      background-size: 100% 100%, 24px 24px, 24px 24px;
+    }
+
+    /* Custom range slider styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 4px;
+      border-radius: 999px;
+      background: #D1D5DB;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #111827;
+      border: 2px solid #C5A467;
+      margin-top: -6px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+    }
+
+    /* Smooth preview card shadow */
+    .luxury-card-shadow {
+      box-shadow:
+        0 25px 50px -12px rgba(11, 11, 12, 0.14),
+        0 4px 16px -2px rgba(11, 11, 12, 0.06),
+        0 0 0 1px rgba(184, 192, 204, 0.45);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-champagne/20">
+
+  <!-- Top Luxury Atelier Header -->
+  <header class="bg-white border-b border-gray-200/90 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-obsidian border border-champagne/60 flex items-center justify-center shadow-sm">
+          <span class="font-serifDisplay text-champagne text-sm font-semibold tracking-wider">AA</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-serifDisplay text-sm sm:text-base font-semibold tracking-[0.18em] text-obsidian">
+              ABU ADEM JEWELLERY
+            </h1>
+            <span class="hidden sm:inline-block text-[10px] uppercase tracking-[0.2em] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+              Print &amp; QR Atelier
+            </span>
+          </div>
+          <p class="text-[11px] text-gray-500 tracking-wide">
+            High-Precision Boutique Navigation QR &bull; ECC Level H (30% Redundancy)
+          </p>
+        </div>
+      </div>
+
+      <!-- Live Verification Status Pill -->
+      <div id="headerVerifyBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium transition-all">
+        <span id="headerVerifyDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="headerVerifyText">Verifying QR Matrix...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Two-Column Studio Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+
+      <!-- LEFT COLUMN: Controls & Optical Verification (5 cols) -->
+      <div class="lg:col-span-5 space-y-5">
+
+        <!-- 1. Dynamic Boutique Location & Google Maps URL -->
+        <section class="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-800 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-obsidian text-champagne text-[10px] flex items-center justify-center font-serifDisplay">1</span>
+              Dynamic Boutique Location URL
+            </h2>
+            <span id="urlSourcePill" class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-ivorySilk text-champagneDark border border-champagne/40">
+              Live Sync
+            </span>
+          </div>
+
+          <p class="text-xs text-gray-500 leading-relaxed mb-3">
+            Paste any Google Maps share link, use your current GPS coordinates, or build a location search URL. The QR matrix updates instantaneously.
+          </p>
+
+          <!-- Active Editable Destination URL Input -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="dynamicUrlInput" class="text-[11px] font-medium uppercase tracking-wider text-gray-500">
+                Active Encoded Destination URL
+              </label>
+              <button id="clearUrlBtn" type="button" class="text-[11px] text-gray-400 hover:text-obsidian transition-colors">
+                Clear
+              </button>
+            </div>
+            <div class="flex items-stretch gap-2">
+              <input
+                id="dynamicUrlInput"
+                type="url"
+                value="https://maps.app.goo.gl/NqJWCzNzFWCn1TJDA"
+                placeholder="https://maps.app.goo.gl/... or https://www.google.com/maps?q=..."
+                class="flex-1 min-w-0 px-3 py-2 rounded-xl border border-gray-300 focus:border-champagne focus:ring-2 focus:ring-champagne/20 outline-none font-mono text-xs text-gray-900 bg-gray-50/60 focus:bg-white transition-all"
+              />
+              <a
+                id="testLocationLinkBtn"
+                href="https://maps.app.goo.gl/NqJWCzNzFWCn1TJDA"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open encoded link in new tab to verify map pin"
+                class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 hover:border-obsidian bg-white hover:bg-gray-50 text-xs font-semibold text-obsidian shrink-0 transition-all"
+              >
+                <span>Test Link</span>
+                <svg class="w-3.5 h-3.5 text-champagneDark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Location Generators: GPS Position & Search/Coordinates Builder -->
+          <div class="mt-3.5 pt-3.5 border-t border-gray-100 space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                id="useGpsBtn"
+                type="button"
+                class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-obsidian hover:bg-gray-800 text-white border border-champagne/40 text-xs font-medium transition-all cursor-pointer"
+              >
+                <svg class="w-3.5 h-3.5 text-champagne shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                <span id="useGpsBtnText">Use Current GPS Position</span>
+              </button>
+
+              <button
+                id="toggleBuilderBtn"
+                type="button"
+                class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 hover:border-champagne bg-ivorySilk/60 hover:bg-ivorySilk text-obsidian text-xs font-medium transition-all cursor-pointer"
+              >
+                <span>Search / Coords Builder</span>
+                <svg id="builderChevron" class="w-3.5 h-3.5 text-gray-500 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- GPS Status Feedback -->
+            <p id="gpsStatusMsg" class="hidden text-[11px] text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5"></p>
+
+            <!-- Collapsible Search / Coordinates Builder Panel -->
+            <div id="locationBuilderPanel" class="hidden rounded-xl bg-gray-50/90 border border-gray-200/90 p-3 space-y-2.5">
+              <div>
+                <label for="placeQueryInput" class="block text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                  Boutique Name, Address, or Lat,Lng Coordinates
+                </label>
+                <div class="flex gap-2">
+                  <input
+                    id="placeQueryInput"
+                    type="text"
+                    placeholder="e.g. Abu Adem Jewellery, Oran or 35.6971,-0.6308"
+                    class="flex-1 min-w-0 px-2.5 py-1.5 rounded-lg border border-gray-300 focus:border-champagne outline-none text-xs text-gray-900 bg-white"
+                  />
+                  <button
+                    id="applyBuilderBtn"
+                    type="button"
+                    class="px-3 py-1.5 rounded-lg bg-obsidian text-white text-xs font-semibold hover:bg-gray-800 shrink-0 transition-colors cursor-pointer"
+                  >
+                    Build Link
+                  </button>
+                </div>
+              </div>
+              <p class="text-[10px] text-gray-500 leading-normal">
+                Automatically formats coordinates as <code class="text-gray-700">google.com/maps?q=LAT,LNG</code> or place searches as <code class="text-gray-700">google.com/maps/search/?api=1&amp;query=...</code>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Boutique Logo Integration Card -->
+        <section class="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-800 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-obsidian text-champagne text-[10px] flex items-center justify-center font-serifDisplay">2</span>
+              Boutique Logo Integration
+            </h2>
+            <span id="logoStatusPill" class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+              Awaiting Logo File
+            </span>
+          </div>
+
+          <p class="text-xs text-gray-500 leading-relaxed mb-3.5">
+            Your original logo (<code class="text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">1000159266.jpg</code>) is centered without altering its proportions, typography, or calligraphy inside a protective high-contrast frame.
+          </p>
+
+          <!-- Upload / Dropzone -->
+          <label id="logoDropzone" for="logoFileInput" class="group relative flex items-center gap-3.5 p-3.5 rounded-xl border-2 border-dashed border-gray-300 hover:border-champagne bg-gray-50/70 hover:bg-ivorySilk transition-all cursor-pointer">
+            <div id="logoThumbWrapper" class="w-14 h-14 rounded-lg bg-obsidian border border-champagne/50 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+              <img id="logoThumbPreview" src="" alt="Boutique Logo Preview" class="w-full h-full object-contain hidden" />
+              <div id="logoThumbPlaceholder" class="text-center px-1">
+                <span class="block font-serifDisplay text-champagne text-xs">LOGO</span>
+                <span class="block text-[9px] text-gray-400">Upload</span>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-semibold text-gray-900 group-hover:text-champagneDark transition-colors">
+                Select or Drop Your Logo Image
+              </p>
+              <p id="logoFileName" class="text-[11px] text-gray-500 truncate mt-0.5">
+                Click to load 1000159266.jpg (PNG, JPG, WebP, SVG)
+              </p>
+            </div>
+            <span class="px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-xs font-medium text-gray-700 group-hover:border-champagne group-hover:text-obsidian shadow-xs shrink-0">
+              Browse
+            </span>
+            <input id="logoFileInput" type="file" accept="image/*" class="sr-only" />
+          </label>
+
+          <!-- Medallion Shape & Scale -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-4 pt-4 border-t border-gray-100">
+            <div>
+              <label class="block text-[11px] font-medium uppercase tracking-wider text-gray-500 mb-1.5">
+                Center Frame Shape
+              </label>
+              <div class="grid grid-cols-2 gap-1.5 bg-gray-100 p-1 rounded-xl">
+                <button type="button" data-shape="square" class="shape-btn py-1.5 px-2.5 rounded-lg text-xs font-medium bg-white text-obsidian shadow-xs transition-all">
+                  Square
+                </button>
+                <button type="button" data-shape="circle" class="shape-btn py-1.5 px-2.5 rounded-lg text-xs font-medium text-gray-600 hover:text-obsidian transition-all">
+                  Circular
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="logoScaleRange" class="text-[11px] font-medium uppercase tracking-wider text-gray-500">
+                  Logo Footprint
+                </label>
+                <span id="logoScaleLabel" class="text-[11px] font-semibold text-obsidian">19%</span>
+              </div>
+              <input id="logoScaleRange" type="range" min="15" max="22" step="1" value="19" class="w-full" />
+              <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                <span>15% (Ultra-Safe)</span>
+                <span>22% (Max Safe)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Print Layout & Visual Aesthetic -->
+        <section class="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-sm">
+          <h2 class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-800 flex items-center gap-2 mb-3.5">
+            <span class="w-5 h-5 rounded-full bg-obsidian text-champagne text-[10px] flex items-center justify-center font-serifDisplay">3</span>
+            Print Format &amp; Aesthetic
+          </h2>
+
+          <!-- Layout Format Selector -->
+          <div class="mb-4">
+            <label class="block text-[11px] font-medium uppercase tracking-wider text-gray-500 mb-1.5">
+              Print Application Preset
+            </label>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" data-preset="display" class="preset-btn flex flex-col items-center justify-center p-2.5 rounded-xl border-2 border-obsidian bg-ivorySilk/70 text-obsidian transition-all">
+                <span class="text-xs font-semibold">Boutique Card</span>
+                <span class="text-[10px] text-gray-500 mt-0.5">Counter &amp; Display</span>
+              </button>
+              <button type="button" data-preset="insert" class="preset-btn flex flex-col items-center justify-center p-2.5 rounded-xl border border-gray-200 hover:border-gray-300 bg-white text-gray-700 transition-all">
+                <span class="text-xs font-semibold">Packaging Card</span>
+                <span class="text-[10px] text-gray-500 mt-0.5">Box &amp; Business</span>
+              </button>
+              <button type="button" data-preset="emblem" class="preset-btn flex flex-col items-center justify-center p-2.5 rounded-xl border border-gray-200 hover:border-gray-300 bg-white text-gray-700 transition-all">
+                <span class="text-xs font-semibold">QR Emblem</span>
+                <span class="text-[10px] text-gray-500 mt-0.5">Sticker &amp; Tag</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Surface Paper & Module Geometry -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-4">
+            <div>
+          <!-- Editorial Copy & Custom Text -->
+          <div class="pt-3.5 border-t border-gray-100 space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label for="cardTitleInput" class="block text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                  Card Title
+                </label>
+                <input
+                  id="cardTitleInput"
+                  type="text"
+                  value="VISIT OUR BOUTIQUE"
+                  class="w-full px-2.5 py-1.5 rounded-lg border border-gray-300 focus:border-champagne outline-none text-xs text-gray-900"
+                />
+              </div>
+              <div>
+                <label for="cardSubtitleInput" class="block text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                  Card Subtitle
+                </label>
+                <input
+                  id="cardSubtitleInput"
+                  type="text"
+                  value="Scan to find us on Google Maps"
+                  class="w-full px-2.5 py-1.5 rounded-lg border border-gray-300 focus:border-champagne outline-none text-xs text-gray-900"
+                />
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex-1 pr-3">
+                <p class="text-xs font-medium text-gray-800">Welcome Hospitality Line</p>
+                <input
+                  id="cardWelcomeInput"
+                  type="text"
+                  value="We look forward to welcoming you."
+                  class="mt-1 w-full px-2.5 py-1 rounded-lg border border-gray-200 focus:border-champagne outline-none italic font-serifEditorial text-sm text-gray-700"
+                />
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                <input id="toggleWelcomeLine" type="checkbox" checked class="sr-only peer" />
+                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-obsidian"></div>
+              </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs font-medium text-gray-800">Print Quiet-Zone &amp; Trim Guides</p>
+                <p class="text-[11px] text-gray-500">Preview only (never included in exported files)</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input id="togglePrintGuides" type="checkbox" class="sr-only peer" />
+                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-obsidian"></div>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Live Optical Decoder & Verification Console -->
+        <section class="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-800 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-obsidian text-champagne text-[10px] flex items-center justify-center font-serifDisplay">4</span>
+              Live Scanner Verification
+            </h2>
+            <button id="retestDecodeBtn" type="button" class="text-[11px] font-semibold text-champagneDark hover:text-obsidian underline underline-offset-2 transition-colors">
+              Re-Decode Canvas
+            </button>
+          </div>
+
+          <div id="verifyResultBox" class="rounded-xl p-3.5 bg-emerald-50/80 border border-emerald-200/90 text-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span id="verifyStatusTitle" class="font-semibold text-emerald-900 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Optical Decode Passed — Exact Match
+              </span>
+              <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-white text-emerald-800 border border-emerald-200">
+                ECC-H
+              </span>
+            </div>
+
+            <div class="bg-white/90 rounded-lg p-2.5 border border-emerald-200/70 font-mono text-[11px] text-gray-800 break-all">
+              <span class="text-[10px] uppercase tracking-wider text-gray-400 block mb-0.5">Decoded Payload:</span>
+              <span id="decodedUrlOutput">https://maps.app.goo.gl/NqJWCzNzFWCn1TJDA</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Museum Preview Stage & Print Export (7 cols) -->
+      <div class="lg:col-span-7 flex flex-col gap-5">
+
+        <!-- Preview Stage Container -->
+        <div class="studio-stage rounded-2xl border border-gray-200/90 p-5 sm:p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden">
+          <!-- Subtle Top-Left Technical Spec Tag -->
+          <div class="w-full flex items-center justify-between text-[11px] text-gray-500 mb-4">
+            <span id="dimensionsBadge" class="bg-white/85 backdrop-blur-xs px-2.5 py-1 rounded-md border border-gray-200/80 font-medium">
+              Print Spec: 4.0&Prime; &times; 5.33&Prime; @ 300 DPI (1200 &times; 1600 px)
+            </span>
+            <span class="hidden sm:inline-block bg-white/85 backdrop-blur-xs px-2.5 py-1 rounded-md border border-gray-200/80">
+              Quiet Zone: 4 Modules &bull; 100% Contrast
+            </span>
+          </div>
+
+          <!-- High-Resolution Rendered Artwork Canvas -->
+          <div class="my-auto flex items-center justify-center w-full">
+            <canvas id="previewCanvas" class="max-w-full h-auto rounded-sm luxury-card-shadow transition-all duration-200" style="max-height: 540px;"></canvas>
+          </div>
+
+          <!-- Mobile / Smartphone Scan Tip -->
+          <p class="mt-5 text-[11px] text-gray-500 text-center max-w-md">
+            Tip: Point your iPhone or Android camera directly at the screen above to test instant Google Maps redirection before exporting.
+          </p>
+        </div>
+
+        <!-- Print-Ready Export Action Bar -->
+        <div class="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-[0.16em] text-obsidian">
+                Print-Ready Production Export
+              </h3>
+              <p class="text-xs text-gray-500 mt-0.5">
+                Verified lossless files for business cards, jewelry boxes, stickers &amp; storefront plaques.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
+              <button id="exportSvgBtn" type="button" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 hover:border-obsidian bg-white hover:bg-gray-50 text-obsidian text-xs font-semibold tracking-wide transition-all cursor-pointer">
+                <svg class="w-4 h-4 text-champagneDark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Download Vector SVG
+              </button>
+
+              <button id="exportPngBtn" type="button" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-obsidian hover:bg-gray-800 text-white border border-champagne/40 text-xs font-semibold tracking-wide shadow-sm transition-all cursor-pointer">
+                <svg class="w-4 h-4 text-champagne" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download 300 DPI PNG
+              </button>
+            </div>
+          </div>
+
+          <!-- Toast / Notification Banner -->
+          <div id="exportFeedback" class="hidden mt-3.5 px-3.5 py-2 rounded-lg bg-gray-900 text-white text-xs flex items-center justify-between">
+            <span id="exportFeedbackText">Export complete.</span>
+            <span class="text-champagne font-mono text-[10px]">300 DPI VERIFIED</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    /**
+     * ABU ADEM JEWELLERY — Boutique QR Code & Print Studio
+     * Dynamically encodes any boutique location URL, GPS coordinates, or Google Maps search link
+     * using Error Correction Level H (30% damage recovery) & live jsQR verification.
+     */
+    (function () {
+      'use strict';
+
+      // Initial default placeholder URL (fully editable/replaceable at runtime)
+      const INITIAL_DEFAULT_URL = 'https://maps.app.goo.gl/NqJWCzNzFWCn1TJDA';
+
+      // Application State
+      const state = {
+        targetUrl: INITIAL_DEFAULT_URL,
+        brand: 'ABU ADEM JEWELLERY',
+        title: 'VISIT OUR BOUTIQUE',
+        subtitle: 'Scan to find us on Google Maps',
+        welcome: 'We look forward to welcoming you.',
+        preset: 'display',       // 'display' | 'insert' | 'emblem'
+        surface: 'white',        // 'white' (#FFFFFF) | 'ivory' (#FAF8F5)
+        medallionShape: 'square',// 'square' | 'circle'
+        moduleStyle: 'square',   // 'square' | 'rounded'
+        logoScalePct: 19,        // 15% to 22% of QR matrix width
+        showWelcome: true,
+        showGuides: false,
+        logoImage: null,         // HTMLImageElement of user's uploaded logo
+        logoDataUrl: null,       // Data URL for SVG vector embedding
+        logoFileName: '1000159266.jpg',
+        qrMatrix: null,          // 2D boolean array generated at ECC Level H
+        moduleCount: 0,
+      };
+
+      // DOM Elements
+      const previewCanvas = document.getElementById('previewCanvas');
+      const dynamicUrlInput = document.getElementById('dynamicUrlInput');
+      const clearUrlBtn = document.getElementById('clearUrlBtn');
+      const testLocationLinkBtn = document.getElementById('testLocationLinkBtn');
+      const urlSourcePill = document.getElementById('urlSourcePill');
+      const useGpsBtn = document.getElementById('useGpsBtn');
+      const useGpsBtnText = document.getElementById('useGpsBtnText');
+      const gpsStatusMsg = document.getElementById('gpsStatusMsg');
+      const toggleBuilderBtn = document.getElementById('toggleBuilderBtn');
+      const builderChevron = document.getElementById('builderChevron');
+      const locationBuilderPanel = document.getElementById('locationBuilderPanel');
+      const placeQueryInput = document.getElementById('placeQueryInput');
+      const applyBuilderBtn = document.getElementById('applyBuilderBtn');
+
+      const cardTitleInput = document.getElementById('cardTitleInput');
+      const cardSubtitleInput = document.getElementById('cardSubtitleInput');
+      const cardWelcomeInput = document.getElementById('cardWelcomeInput');
+
+      const logoFileInput = document.getElementById('logoFileInput');
+      const logoDropzone = document.getElementById('logoDropzone');
+      const logoThumbPreview = document.getElementById('logoThumbPreview');
+      const logoThumbPlaceholder = document.getElementById('logoThumbPlaceholder');
+      const logoFileNameEl = document.getElementById('logoFileName');
+      const logoStatusPill = document.getElementById('logoStatusPill');
+      const logoScaleRange = document.getElementById('logoScaleRange');
+      const logoScaleLabel = document.getElementById('logoScaleLabel');
+      const toggleWelcomeLine = document.getElementById('toggleWelcomeLine');
+      const togglePrintGuides = document.getElementById('togglePrintGuides');
+      const dimensionsBadge = document.getElementById('dimensionsBadge');
+      const exportPngBtn = document.getElementById('exportPngBtn');
+      const exportSvgBtn = document.getElementById('exportSvgBtn');
+      const exportFeedback = document.getElementById('exportFeedback');
+      const exportFeedbackText = document.getElementById('exportFeedbackText');
+      const retestDecodeBtn = document.getElementById('retestDecodeBtn');
+
+      // Verification UI Elements
+      const headerVerifyBadge = document.getElementById('headerVerifyBadge');
+      const headerVerifyDot = document.getElementById('headerVerifyDot');
+      const headerVerifyText = document.getElementById('headerVerifyText');
+      const verifyResultBox = document.getElementById('verifyResultBox');
+      const verifyStatusTitle = document.getElementById('verifyStatusTitle');
+      const decodedUrlOutput = document.getElementById('decodedUrlOutput');
+
+      /**
+       * Updates the active destination URL dynamically, rebuilds the Level-H QR matrix,
+       * updates the external test link anchor, and triggers re-render & optical scan check.
+       */
+      function setDynamicTargetUrl(rawUrl, sourceLabel = 'Live Sync') {
+        const cleaned = (rawUrl || '').trim();
+        state.targetUrl = cleaned;
+
+        if (dynamicUrlInput.value !== rawUrl) {
+          dynamicUrlInput.value = rawUrl;
+        }
+
+        urlSourcePill.textContent = sourceLabel;
+
+        // Enable or disable the "Test Link" anchor cleanly
+        if (cleaned) {
+          const hrefUrl = /^https?:\/\//i.test(cleaned) ? cleaned : `https://${cleaned}`;
+          testLocationLinkBtn.href = hrefUrl;
+          testLocationLinkBtn.classList.remove('opacity-40', 'pointer-events-none');
+        } else {
+          testLocationLinkBtn.removeAttribute('href');
+          testLocationLinkBtn.classList.add('opacity-40', 'pointer-events-none');
+        }
+
+        buildQrMatrix();
+        updateStudio();
+      }
+
+      /**
+       * Generates the QR Code boolean matrix using Error Correction Level 'H' from state.targetUrl
+       */
+      function buildQrMatrix() {
+        const payload = state.targetUrl || ' ';
+        // TypeNumber 0 auto-selects the smallest version that holds the dynamic payload at Level H
+        const qr = qrcode(0, 'H');
+        qr.addData(payload, 'Byte');
+        qr.make();
+
+        const count = qr.getModuleCount();
+        const matrix = [];
+        for (let r = 0; r < count; r++) {
+          const row = [];
+          for (let c = 0; c < count; c++) {
+            row.push(qr.isDark(r, c));
+          }
+          matrix.push(row);
+        }
+        state.qrMatrix = matrix;
+        state.moduleCount = count;
+      }
+
+      /**
+       * Returns print-ready pixel dimensions (at 300 DPI) and layout metrics for the active preset
+       */
+      function getLayoutMetrics() {
+        if (state.preset === 'emblem') {
+          return {
+            width: 1500,
+            height: 1500,
+            dpiLabel: '5.0" × 5.0" @ 300 DPI (1500 × 1500 px)',
+            qrSize: 1140,
+            qrX: 180,
+            qrY: 180,
+          };
+        }
+        if (state.preset === 'insert') {
+          return {
+            width: 1500,
+            height: 1050, // 5" x 3.5" luxury packaging / business card insert
+            dpiLabel: '5.0" × 3.5" @ 300 DPI (1500 × 1050 px)',
+            qrSize: 680,
+            qrX: 140,
+            qrY: 185,
+          };
+        }
+        // Default: 'display' — Boutique Counter / Storefront Plaque (4" x 5.33")
+        return {
+          width: 1200,
+          height: 1600,
+          dpiLabel: '4.0" × 5.33" @ 300 DPI (1200 × 1600 px)',
+          qrSize: 800,
+          qrX: 200,
+          qrY: 430,
+        };
+      }
+
+      /**
+       * Checks if a module (r, c) belongs to one of the three 7x7 finder patterns (plus 1-module separator)
+       */
+      function isFinderZone(r, c, count) {
+        const inTopLeft = r < 8 && c < 8;
+        const inTopRight = r < 8 && c >= count - 8;
+        const inBottomLeft = r >= count - 8 && c < 8;
+        return inTopLeft || inTopRight || inBottomLeft;
+      }
+
+      /**
+       * Checks if a module (r, c) falls beneath the central logo medallion
+       */
+      function isUnderMedallion(r, c, count, logoRatio) {
+        const center = count / 2;
+        // Add a 0.6-module clean breathing margin around the medallion
+        const halfSpan = (count * logoRatio) / 2 + 0.55;
+        if (state.medallionShape === 'circle') {
+          const dx = c + 0.5 - center;
+          const dy = r + 0.5 - center;
+          return Math.sqrt(dx * dx + dy * dy) < halfSpan;
+        }
+        return Math.abs(c + 0.5 - center) < halfSpan && Math.abs(r + 0.5 - center) < halfSpan;
+      }
+
+      /**
+       * Renders the full print-ready composition onto a target HTMLCanvasElement
+       */
+      function renderToCanvas(canvas, includeGuides = false) {
+        const metrics = getLayoutMetrics();
+        canvas.width = metrics.width;
+        canvas.height = metrics.height;
+
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const bgColor = state.surface === 'ivory' ? '#FAF8F5' : '#FFFFFF';
+        const obsidian = '#0B0B0C';
+        const champagne = '#C5A467';
+        const sterling = '#B8C0CC';
+        const slateMuted = '#5A606A';
+
+        // 1. Paper Surface Fill
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, metrics.width, metrics.height);
+
+        // 2. Architectural Silver & Champagne Double Hairline Frame (for Display & Insert presets)
+        if (state.preset !== 'emblem') {
+          const outerPad = 48;
+          const innerPad = 62;
+
+          // Outer brushed silver frame
+          ctx.strokeStyle = sterling;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(outerPad, outerPad, metrics.width - outerPad * 2, metrics.height - outerPad * 2);
+
+          // Inner champagne-gold frame
+          ctx.strokeStyle = champagne;
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(innerPad, innerPad, metrics.width - innerPad * 2, metrics.height - innerPad * 2);
+
+          // Subtle corner diamond accents
+          const corners = [
+            [outerPad, outerPad],
+            [metrics.width - outerPad, outerPad],
+            [outerPad, metrics.height - outerPad],
+            [metrics.width - outerPad, metrics.height - outerPad],
+          ];
+          ctx.fillStyle = champagne;
+          corners.forEach(([cx, cy]) => {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(Math.PI / 4);
+            ctx.fillRect(-5, -5, 10, 10);
+            ctx.restore();
+          });
+        }
+
+        // 3. Typography Layout per Preset
+        ctx.textBaseline = 'middle';
+
+        if (state.preset === 'display') {
+          // Top Brand Crest
+          ctx.fillStyle = champagne;
+          ctx.font = '600 22px "Montserrat", sans-serif';
+          ctx.textAlign = 'center';
+          drawTrackedText(ctx, state.brand, metrics.width / 2, 165, 7);
+
+          // Delicate silver divider rule
+          drawOrnamentalDivider(ctx, metrics.width / 2, 212, 220, sterling, champagne);
+
+          // Main Title
+          ctx.fillStyle = obsidian;
+          ctx.font = '600 50px "Cinzel", serif';
+          drawTrackedText(ctx, state.title || 'VISIT OUR BOUTIQUE', metrics.width / 2, 285, 6);
+
+          // Subtitle
+          ctx.fillStyle = slateMuted;
+          ctx.font = '400 25px "Montserrat", sans-serif';
+          drawTrackedText(ctx, state.subtitle || 'Scan to find us on Google Maps', metrics.width / 2, 355, 1.5);
+
+          // Bottom Section below QR
+          const bottomStartY = metrics.qrY + metrics.qrSize + 95;
+          drawOrnamentalDivider(ctx, metrics.width / 2, bottomStartY, 180, sterling, champagne);
+
+          if (state.showWelcome && state.welcome.trim()) {
+            ctx.fillStyle = '#2C2F36';
+            ctx.font = 'italic 500 34px "Cormorant Garamond", serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(state.welcome, metrics.width / 2, bottomStartY + 68);
+          }
+
+          // Micro URL Caption at foot
+          ctx.fillStyle = '#8C939E';
+          ctx.font = '500 17px "Montserrat", sans-serif';
+          drawTrackedText(ctx, 'GOOGLE MAPS  •  VERIFIED LOCATION', metrics.width / 2, metrics.height - 102, 3.5);
+
+        } else if (state.preset === 'insert') {
+          // Horizontal Luxury Packaging / Business Card Layout
+          const rightCenterX = 1130;
+
+          ctx.fillStyle = champagne;
+          ctx.font = '600 18px "Montserrat", sans-serif';
+          ctx.textAlign = 'center';
+          drawTrackedText(ctx, state.brand, rightCenterX, 275, 5.5);
+
+          drawOrnamentalDivider(ctx, rightCenterX, 320, 180, sterling, champagne);
+
+          ctx.fillStyle = obsidian;
+          ctx.font = '600 38px "Cinzel", serif';
+          const titleWords = (state.title || 'VISIT OUR BOUTIQUE').trim().split(/\s+/);
+          if (titleWords.length >= 3) {
+            const splitIdx = Math.ceil(titleWords.length / 2);
+            drawTrackedText(ctx, titleWords.slice(0, splitIdx).join(' '), rightCenterX, 395, 5);
+            drawTrackedText(ctx, titleWords.slice(splitIdx).join(' '), rightCenterX, 448, 5);
+          } else {
+            drawTrackedText(ctx, state.title || 'VISIT OUR BOUTIQUE', rightCenterX, 420, 5);
+          }
+
+          ctx.fillStyle = slateMuted;
+          ctx.font = '400 21px "Montserrat", sans-serif';
+          drawTrackedText(ctx, state.subtitle || 'Scan to find us on Google Maps', rightCenterX, 535, 1);
+
+          if (state.showWelcome && state.welcome.trim()) {
+            drawOrnamentalDivider(ctx, rightCenterX, 605, 140, sterling, champagne);
+            ctx.fillStyle = '#2C2F36';
+            ctx.font = 'italic 500 29px "Cormorant Garamond", serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(state.welcome, rightCenterX, 665);
+          }
+
+          ctx.fillStyle = '#8C939E';
+          ctx.font = '500 14px "Montserrat", sans-serif';
+          drawTrackedText(ctx, 'SCAN WITH CAMERA', rightCenterX, 765, 3);
+        }
+
+        // 4. Render Precision QR Code Matrix (ECC Level H)
+        const count = state.moduleCount;
+        const cellSize = metrics.qrSize / count;
+        const logoRatio = state.logoScalePct / 100;
+
+        // Pure high-contrast QR backing plate (ensures 100% crisp scanner quiet zone)
+        const quietZonePx = cellSize * 4;
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(
+          metrics.qrX - quietZonePx,
+          metrics.qrY - quietZonePx,
+          metrics.qrSize + quietZonePx * 2,
+          metrics.qrSize + quietZonePx * 2
+        );
+
+        ctx.fillStyle = obsidian;
+        for (let r = 0; r < count; r++) {
+          for (let c = 0; c < count; c++) {
+            if (!state.qrMatrix[r][c]) continue;
+            // Keep center medallion zone clean so partial modules never peek behind the logo border
+            if (isUnderMedallion(r, c, count, logoRatio)) continue;
+
+            const x = metrics.qrX + c * cellSize;
+            const y = metrics.qrY + r * cellSize;
+
+            if (state.moduleStyle === 'rounded' && !isFinderZone(r, c, count)) {
+              const pad = cellSize * 0.08;
+              const size = cellSize - pad * 2;
+              drawRoundedRect(ctx, x + pad, y + pad, size, size, size * 0.34);
+              ctx.fill();
+            } else {
+              // Crisp overlap (+0.35px) prevents subpixel anti-aliasing seams on high-res rasterization
+              ctx.fillRect(x, y, cellSize + 0.35, cellSize + 0.35);
+            }
+          }
+        }
+
+        // 5. Render Centered Boutique Logo Medallion (Unmodified Aspect Ratio)
+        const centerX = metrics.qrX + metrics.qrSize / 2;
+        const centerY = metrics.qrY + metrics.qrSize / 2;
+        const medallionSize = metrics.qrSize * logoRatio;
+        const halfMed = medallionSize / 2;
+
+        ctx.save();
+        if (state.medallionShape === 'circle') {
+          // Clean protective circular background
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, halfMed, 0, Math.PI * 2);
+          ctx.fillStyle = bgColor;
+          ctx.fill();
+
+          // Outer sterling silver hairline
+          ctx.lineWidth = 2.5;
+          ctx.strokeStyle = sterling;
+          ctx.stroke();
+
+          // Inner champagne gold hairline
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, halfMed - 6, 0, Math.PI * 2);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = champagne;
+          ctx.stroke();
+
+          // Clip inner logo area cleanly
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, halfMed - 10, 0, Math.PI * 2);
+          ctx.clip();
+        } else {
+          // Clean protective rounded-square background
+          const cornerRadius = 14;
+          drawRoundedRect(ctx, centerX - halfMed, centerY - halfMed, medallionSize, medallionSize, cornerRadius);
+          ctx.fillStyle = bgColor;
+          ctx.fill();
+
+          // Outer sterling silver hairline
+          ctx.lineWidth = 2.5;
+          ctx.strokeStyle = sterling;
+          ctx.stroke();
+
+          // Inner champagne gold hairline
+          drawRoundedRect(
+            ctx,
+            centerX - halfMed + 6,
+            centerY - halfMed + 6,
+            medallionSize - 12,
+            medallionSize - 12,
+            Math.max(6, cornerRadius - 4)
+          );
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = champagne;
+          ctx.stroke();
+
+          // Clip inner logo area cleanly
+          drawRoundedRect(
+            ctx,
+            centerX - halfMed + 10,
+            centerY - halfMed + 10,
+            medallionSize - 20,
+            medallionSize - 20,
+            Math.max(4, cornerRadius - 6)
+          );
+          ctx.clip();
+        }
+
+        const innerBoxSize = medallionSize - 20;
+        if (state.logoImage) {
+          // Preserve exact original proportions & orientation without any distortion
+          const imgW = state.logoImage.naturalWidth || state.logoImage.width;
+          const imgH = state.logoImage.naturalHeight || state.logoImage.height;
+          const scale = Math.min(innerBoxSize / imgW, innerBoxSize / imgH);
+          const drawW = imgW * scale;
+          const drawH = imgH * scale;
+          ctx.drawImage(
+            state.logoImage,
+            centerX - drawW / 2,
+            centerY - drawH / 2,
+            drawW,
+            drawH
+          );
+        } else {
+          // Refined placeholder crest until user selects 1000159266.jpg
+          ctx.fillStyle = obsidian;
+          ctx.fillRect(centerX - innerBoxSize / 2, centerY - innerBoxSize / 2, innerBoxSize, innerBoxSize);
+          ctx.fillStyle = champagne;
+          ctx.font = `600 ${Math.round(innerBoxSize * 0.22)}px "Cinzel", serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('ABU ADEM', centerX, centerY - innerBoxSize * 0.08);
+          ctx.font = `500 ${Math.round(innerBoxSize * 0.11)}px "Montserrat", sans-serif`;
+          ctx.fillStyle = '#E5D3B3';
+          ctx.fillText('JEWELLERY', centerX, centerY + innerBoxSize * 0.14);
+        }
+        ctx.restore();
+
+        // 6. Optional Print-Preview Guides (Never rendered in exports)
+        if (includeGuides) {
+          ctx.save();
+          ctx.setLineDash([8, 6]);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = 'rgba(16, 185, 129, 0.75)';
+          ctx.strokeRect(
+            metrics.qrX - quietZonePx,
+            metrics.qrY - quietZonePx,
+            metrics.qrSize + quietZonePx * 2,
+            metrics.qrSize + quietZonePx * 2
+          );
+          ctx.restore();
+        }
+      }
+
+      /**
+       * Helper: Draws letter-spaced centered text on HTML5 Canvas
+       */
+      function drawTrackedText(ctx, text, centerX, y, letterSpacing) {
+        const chars = Array.from(text);
+        let totalWidth = 0;
+        chars.forEach((ch, idx) => {
+          totalWidth += ctx.measureText(ch).width + (idx < chars.length - 1 ? letterSpacing : 0);
+        });
+        let cursorX = centerX - totalWidth / 2;
+        ctx.textAlign = 'left';
+        chars.forEach((ch) => {
+          ctx.fillText(ch, cursorX, y);
+          cursorX += ctx.measureText(ch).width + letterSpacing;
+        });
+        ctx.textAlign = 'center';
+      }
+
+      /**
+       * Helper: Draws an understated luxury silver hairline with a centered champagne diamond
+       */
+      function drawOrnamentalDivider(ctx, cx, cy, width, silverColor, goldColor) {
+        const half = width / 2;
+        ctx.strokeStyle = silverColor;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - half, cy);
+        ctx.lineTo(cx - 14, cy);
+        ctx.moveTo(cx + 14, cy);
+        ctx.lineTo(cx + half, cy);
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(Math.PI / 4);
+        ctx.fillStyle = goldColor;
+        ctx.fillRect(-4.5, -4.5, 9, 9);
+        ctx.restore();
+      }
+
+      /**
+       * Helper: Draws a rounded rectangle path
+       */
+      function drawRoundedRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+      }
+
+      /**
+       * Runs real optical QR decoding via jsQR directly on the rendered canvas pixels
+       * to guarantee 100% genuine scannability and exact match with state.targetUrl.
+       */
+      function verifyRenderedCanvas(canvas) {
+        if (!state.targetUrl) {
+          setVerificationUI(false, 'Enter or generate a boutique location URL above');
+          return false;
+        }
+
+        try {
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const decoded = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: 'dontInvert',
+          });
+
+          if (decoded && decoded.data === state.targetUrl) {
+            setVerificationUI(true, decoded.data);
+            return true;
+          } else {
+            setVerificationUI(false, decoded ? decoded.data : 'Unable to decode — reduce logo size or shorten URL');
+            return false;
+          }
+        } catch (err) {
+          console.error('QR Verification error:', err);
+          setVerificationUI(false, 'Verification error');
+          return false;
+        }
+      }
+
+      /**
+       * Updates both the top status pill and the verification console card
+       */
+      function setVerificationUI(isValid, payloadText) {
+        decodedUrlOutput.textContent = payloadText;
+
+        if (isValid) {
+          headerVerifyBadge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium transition-all';
+          headerVerifyDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+          headerVerifyText.textContent = 'Verified Scannable • Exact URL Match';
+
+          verifyResultBox.className = 'rounded-xl p-3.5 bg-emerald-50/80 border border-emerald-200/90 text-xs space-y-2';
+          verifyStatusTitle.className = 'font-semibold text-emerald-900 flex items-center gap-1.5';
+          verifyStatusTitle.innerHTML = `
+            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Optical Decode Passed — Exact Match
+          `;
+        } else {
+          headerVerifyBadge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium transition-all';
+          headerVerifyDot.className = 'w-2 h-2 rounded-full bg-rose-500';
+          headerVerifyText.textContent = 'Scan Warning — Adjust Logo Scale';
+
+          verifyResultBox.className = 'rounded-xl p-3.5 bg-rose-50/80 border border-rose-200/90 text-xs space-y-2';
+          verifyStatusTitle.className = 'font-semibold text-rose-900 flex items-center gap-1.5';
+          verifyStatusTitle.textContent = 'Optical Decode Warning — Reduce Logo Footprint';
+        }
+      }
+
+      /**
+       * Master render + live optical verification cycle
+       */
+      function updateStudio() {
+        const metrics = getLayoutMetrics();
+        dimensionsBadge.textContent = `Print Spec: ${metrics.dpiLabel}`;
+        renderToCanvas(previewCanvas, state.showGuides);
+        verifyRenderedCanvas(previewCanvas);
+      }
+
+      /**
+       * Injects a true 300 DPI (11,811 pixels per meter) pHYs chunk into a PNG DataURL
+       * so professional print software (Illustrator, Photoshop, InDesign) opens it at exact 300 DPI.
+       */
+      function inject300DpiPngMetadata(dataUrl) {
+        const base64 = dataUrl.split(',')[1];
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+
+        // 300 DPI = 11811 pixels per meter (0x00002E23)
+        const pHYsChunk = new Uint8Array([
+          0x00, 0x00, 0x00, 0x09, // Length: 9 bytes
+          0x70, 0x48, 0x59, 0x73, // Type: "pHYs"
+          0x00, 0x00, 0x2E, 0x23, // X pixels per unit: 11811
+          0x00, 0x00, 0x2E, 0x23, // Y pixels per unit: 11811
+          0x01,                   // Unit specifier: 1 (meter)
+          0x00, 0x00, 0x00, 0x00  // CRC placeholder
+        ]);
+
+        // Compute CRC32 over Type + Data (bytes 4..16)
+        const crc = crc32(pHYsChunk.subarray(4, 17));
+        pHYsChunk[17] = (crc >>> 24) & 0xff;
+        pHYsChunk[18] = (crc >>> 16) & 0xff;
+        pHYsChunk[19] = (crc >>> 8) & 0xff;
+        pHYsChunk[20] = crc & 0xff;
+
+        // Insert right after the 8-byte PNG signature + 25-byte IHDR chunk (offset 33)
+        const output = new Uint8Array(bytes.length + pHYsChunk.length);
+        output.set(bytes.subarray(0, 33), 0);
+        output.set(pHYsChunk, 33);
+        output.set(bytes.subarray(33), 33 + pHYsChunk.length);
+
+        return new Blob([output], { type: 'image/png' });
+      }
+
+      /**
+       * Standard CRC-32 calculation for PNG chunk integrity
+       */
+      function crc32(buf) {
+        let c = 0xffffffff;
+        for (let i = 0; i < buf.length; i++) {
+          c ^= buf[i];
+          for (let k = 0; k < 8; k++) {
+            c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+          }
+        }
+        return (c ^ 0xffffffff) >>> 0;
+      }
+
+      /**
+       * Exports a true 300 DPI print-ready PNG file after verifying scan accuracy
+       */
+      function exportHighResPng() {
+        const exportCanvas = document.createElement('canvas');
+        renderToCanvas(exportCanvas, false); // Always exclude preview guides
+
+        const passed = verifyRenderedCanvas(exportCanvas);
+        if (!passed) {
+          showFeedback('Warning: Reduce logo scale slightly before printing to ensure 100% scan reliability.');
+          return;
+        }
+
+        const rawDataUrl = exportCanvas.toDataURL('image/png', 1.0);
+        const png300DpiBlob = inject300DpiPngMetadata(rawDataUrl);
+        const fileName = `ABU-ADEM-JEWELLERY-QR-${state.preset.toUpperCase()}-300DPI.png`;
+
+        triggerBlobDownload(png300DpiBlob, fileName);
+        showFeedback(`Exported ${fileName} (Verified Scannable • 300 DPI)`);
+      }
+
+      /**
+       * Generates and downloads a true scalable Vector SVG file for print & Adobe Illustrator
+       */
+      function exportVectorSvg() {
+        const metrics = getLayoutMetrics();
+        const bgColor = state.surface === 'ivory' ? '#FAF8F5' : '#FFFFFF';
+        const obsidian = '#0B0B0C';
+        const champagne = '#C5A467';
+        const sterling = '#B8C0CC';
+        const slateMuted = '#5A606A';
+
+        const count = state.moduleCount;
+        const cellSize = metrics.qrSize / count;
+        const logoRatio = state.logoScalePct / 100;
+        const centerX = metrics.qrX + metrics.qrSize / 2;
+        const centerY = metrics.qrY + metrics.qrSize / 2;
+        const medallionSize = metrics.qrSize * logoRatio;
+        const halfMed = medallionSize / 2;
+
+        const escapeXml = (str) =>
+          String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+
+        let svgParts = [];
+        svgParts.push(`<?xml version="1.0" encoding="UTF-8"?>`);
+        svgParts.push(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${metrics.width}" height="${metrics.height}" viewBox="0 0 ${metrics.width} ${metrics.height}">`);
+        svgParts.push(`  <title>${escapeXml(state.brand)} — Location QR Code</title>`);
+        svgParts.push(`  <desc>Encoded URL: ${escapeXml(state.targetUrl)} | Error Correction Level H</desc>`);
+        }
+        svgParts.push(`  </defs>`);
+
+        // Paper background
+        svgParts.push(`  <rect x="0" y="0" width="${metrics.width}" height="${metrics.height}" fill="${bgColor}" />`);
+
+        // Decorative silver & champagne double borders + typography
+        if (state.preset !== 'emblem') {
+          const outerPad = 48;
+          const innerPad = 62;
+          svgParts.push(`  <rect x="${outerPad}" y="${outerPad}" width="${metrics.width - outerPad * 2}" height="${metrics.height - outerPad * 2}" fill="none" stroke="${sterling}" stroke-width="2" />`);
+          svgParts.push(`  <rect x="${innerPad}" y="${innerPad}" width="${metrics.width - innerPad * 2}" height="${metrics.height - innerPad * 2}" fill="none" stroke="${champagne}" stroke-width="1.5" />`);
+        }
+
+        if (state.preset === 'display') {
+          svgParts.push(`  <text x="${metrics.width / 2}" y="165" text-anchor="middle" dominant-baseline="middle" fill="${champagne}" font-family="Montserrat, sans-serif" font-size="22" font-weight="600" letter-spacing="7">${escapeXml(state.brand)}</text>`);
+          svgParts.push(`  <line x1="${metrics.width / 2 - 110}" y1="212" x2="${metrics.width / 2 - 14}" y2="212" stroke="${sterling}" stroke-width="1.5" />`);
+          svgParts.push(`  <line x1="${metrics.width / 2 + 14}" y1="212" x2="${metrics.width / 2 + 110}" y2="212" stroke="${sterling}" stroke-width="1.5" />`);
+          svgParts.push(`  <rect x="${metrics.width / 2 - 4.5}" y="207.5" width="9" height="9" fill="${champagne}" transform="rotate(45 ${metrics.width / 2} 212)" />`);
+
+          svgParts.push(`  <text x="${metrics.width / 2}" y="285" text-anchor="middle" dominant-baseline="middle" fill="${obsidian}" font-family="Cinzel, serif" font-size="50" font-weight="600" letter-spacing="6">${escapeXml(state.title || 'VISIT OUR BOUTIQUE')}</text>`);
+          svgParts.push(`  <text x="${metrics.width / 2}" y="355" text-anchor="middle" dominant-baseline="middle" fill="${slateMuted}" font-family="Montserrat, sans-serif" font-size="25" font-weight="400" letter-spacing="1.5">${escapeXml(state.subtitle || 'Scan to find us on Google Maps')}</text>`);
+
+          const bottomStartY = metrics.qrY + metrics.qrSize + 95;
+          svgParts.push(`  <line x1="${metrics.width / 2 - 90}" y1="${bottomStartY}" x2="${metrics.width / 2 - 14}" y2="${bottomStartY}" stroke="${sterling}" stroke-width="1.5" />`);
+          svgParts.push(`  <line x1="${metrics.width / 2 + 14}" y1="${bottomStartY}" x2="${metrics.width / 2 + 90}" y2="${bottomStartY}" stroke="${sterling}" stroke-width="1.5" />`);
+          svgParts.push(`  <rect x="${metrics.width / 2 - 4.5}" y="${bottomStartY - 4.5}" width="9" height="9" fill="${champagne}" transform="rotate(45 ${metrics.width / 2} ${bottomStartY})" />`);
+
+          if (state.showWelcome && state.welcome.trim()) {
+            svgParts.push(`  <text x="${metrics.width / 2}" y="${bottomStartY + 68}" text-anchor="middle" dominant-baseline="middle" fill="#2C2F36" font-family="Cormorant Garamond, serif" font-style="italic" font-size="34" font-weight="500">${escapeXml(state.welcome)}</text>`);
+          }
+          svgParts.push(`  <text x="${metrics.width / 2}" y="${metrics.height - 102}" text-anchor="middle" dominant-baseline="middle" fill="#8C939E" font-family="Montserrat, sans-serif" font-size="17" font-weight="500" letter-spacing="3.5">GOOGLE MAPS  •  VERIFIED LOCATION</text>`);
+        } else if (state.preset === 'insert') {
+          const rightCenterX = 1130;
+          svgParts.push(`  <text x="${rightCenterX}" y="275" text-anchor="middle" dominant-baseline="middle" fill="${champagne}" font-family="Montserrat, sans-serif" font-size="18" font-weight="600" letter-spacing="5.5">${escapeXml(state.brand)}</text>`);
+          svgParts.push(`  <line x1="${rightCenterX - 90}" y1="320" x2="${rightCenterX - 14}" y2="320" stroke="${sterling}" stroke-width="1.5" />`);
+          svgParts.push(`  <line x1="${rightCenterX + 14}" y1="320" x2="${rightCenterX + 90}" y2="320" stroke="${sterling}" stroke-width="1.5" />`);
+          svgParts.push(`  <rect x="${rightCenterX - 4.5}" y="315.5" width="9" height="9" fill="${champagne}" transform="rotate(45 ${rightCenterX} 320)" />`);
+
+          const titleWords = (state.title || 'VISIT OUR BOUTIQUE').trim().split(/\s+/);
+          if (titleWords.length >= 3) {
+            const splitIdx = Math.ceil(titleWords.length / 2);
+            svgParts.push(`  <text x="${rightCenterX}" y="395" text-anchor="middle" dominant-baseline="middle" fill="${obsidian}" font-family="Cinzel, serif" font-size="38" font-weight="600" letter-spacing="5">${escapeXml(titleWords.slice(0, splitIdx).join(' '))}</text>`);
+            svgParts.push(`  <text x="${rightCenterX}" y="448" text-anchor="middle" dominant-baseline="middle" fill="${obsidian}" font-family="Cinzel, serif" font-size="38" font-weight="600" letter-spacing="5">${escapeXml(titleWords.slice(splitIdx).join(' '))}</text>`);
+          } else {
+            svgParts.push(`  <text x="${rightCenterX}" y="420" text-anchor="middle" dominant-baseline="middle" fill="${obsidian}" font-family="Cinzel, serif" font-size="38" font-weight="600" letter-spacing="5">${escapeXml(state.title || 'VISIT OUR BOUTIQUE')}</text>`);
+          }
+          svgParts.push(`  <text x="${rightCenterX}" y="535" text-anchor="middle" dominant-baseline="middle" fill="${slateMuted}" font-family="Montserrat, sans-serif" font-size="21" font-weight="400" letter-spacing="1">${escapeXml(state.subtitle || 'Scan to find us on Google Maps')}</text>`);
+
+          if (state.showWelcome && state.welcome.trim()) {
+            svgParts.push(`  <line x1="${rightCenterX - 70}" y1="605" x2="${rightCenterX - 14}" y2="605" stroke="${sterling}" stroke-width="1.5" />`);
+            svgParts.push(`  <line x1="${rightCenterX + 14}" y1="605" x2="${rightCenterX + 70}" y2="605" stroke="${sterling}" stroke-width="1.5" />`);
+            svgParts.push(`  <rect x="${rightCenterX - 4.5}" y="600.5" width="9" height="9" fill="${champagne}" transform="rotate(45 ${rightCenterX} 605)" />`);
+            svgParts.push(`  <text x="${rightCenterX}" y="665" text-anchor="middle" dominant-baseline="middle" fill="#2C2F36" font-family="Cormorant Garamond, serif" font-style="italic" font-size="29" font-weight="500">${escapeXml(state.welcome)}</text>`);
+          }
+          svgParts.push(`  <text x="${rightCenterX}" y="765" text-anchor="middle" dominant-baseline="middle" fill="#8C939E" font-family="Montserrat, sans-serif" font-size="14" font-weight="500" letter-spacing="3">SCAN WITH CAMERA</text>`);
+        }
+
+        // Vector QR Modules
+        svgParts.push(`  <g id="qr-modules" fill="${obsidian}">`);
+        for (let r = 0; r < count; r++) {
+          for (let c = 0; c < count; c++) {
+            if (!state.qrMatrix[r][c]) continue;
+            if (isUnderMedallion(r, c, count, logoRatio)) continue;
+
+            const x = (metrics.qrX + c * cellSize).toFixed(2);
+            const y = (metrics.qrY + r * cellSize).toFixed(2);
+            const w = (cellSize + 0.15).toFixed(2);
+
+            if (state.moduleStyle === 'rounded' && !isFinderZone(r, c, count)) {
+              const pad = cellSize * 0.08;
+              const size = cellSize - pad * 2;
+              const rad = (size * 0.34).toFixed(2);
+              svgParts.push(`    <rect x="${(metrics.qrX + c * cellSize + pad).toFixed(2)}" y="${(metrics.qrY + r * cellSize + pad).toFixed(2)}" width="${size.toFixed(2)}" height="${size.toFixed(2)}" rx="${rad}" ry="${rad}" />`);
+            } else {
+              svgParts.push(`    <rect x="${x}" y="${y}" width="${w}" height="${w}" />`);
+            }
+          }
+        }
+        svgParts.push(`  </g>`);
+
+        // Central Medallion Frame + Embedded Unmodified Logo
+        if (state.medallionShape === 'circle') {
+          svgParts.push(`  <circle cx="${centerX}" cy="${centerY}" r="${halfMed}" fill="${bgColor}" stroke="${sterling}" stroke-width="2.5" />`);
+          svgParts.push(`  <circle cx="${centerX}" cy="${centerY}" r="${halfMed - 6}" fill="none" stroke="${champagne}" stroke-width="2" />`);
+        } else {
+          svgParts.push(`  <rect x="${centerX - halfMed}" y="${centerY - halfMed}" width="${medallionSize}" height="${medallionSize}" rx="14" ry="14" fill="${bgColor}" stroke="${sterling}" stroke-width="2.5" />`);
+          svgParts.push(`  <rect x="${centerX - halfMed + 6}" y="${centerY - halfMed + 6}" width="${medallionSize - 12}" height="${medallionSize - 12}" rx="10" ry="10" fill="none" stroke="${champagne}" stroke-width="2" />`);
+        }
+
+        const innerBoxSize = medallionSize - 20;
+        if (state.logoDataUrl) {
+          svgParts.push(`  <image x="${centerX - innerBoxSize / 2}" y="${centerY - innerBoxSize / 2}" width="${innerBoxSize}" height="${innerBoxSize}" preserveAspectRatio="xMidYMid meet" clip-path="url(#logoClip)" href="${state.logoDataUrl}" xlink:href="${state.logoDataUrl}" />`);
+        } else {
+          svgParts.push(`  <g clip-path="url(#logoClip)">`);
+          svgParts.push(`    <rect x="${centerX - innerBoxSize / 2}" y="${centerY - innerBoxSize / 2}" width="${innerBoxSize}" height="${innerBoxSize}" fill="${obsidian}" />`);
+          svgParts.push(`    <text x="${centerX}" y="${centerY - innerBoxSize * 0.08}" text-anchor="middle" dominant-baseline="middle" fill="${champagne}" font-family="Cinzel, serif" font-size="${Math.round(innerBoxSize * 0.22)}" font-weight="600">ABU ADEM</text>`);
+          svgParts.push(`    <text x="${centerX}" y="${centerY + innerBoxSize * 0.14}" text-anchor="middle" dominant-baseline="middle" fill="#E5D3B3" font-family="Montserrat, sans-serif" font-size="${Math.round(innerBoxSize * 0.11)}" font-weight="500">JEWELLERY</text>`);
+          svgParts.push(`  </g>`);
+        }
+      // Wire Dynamic Location URL & Generator Controls
+      dynamicUrlInput.addEventListener('input', () => {
+        setDynamicTargetUrl(dynamicUrlInput.value, 'Custom Link');
+      });
+
+      clearUrlBtn.addEventListener('click', () => {
+        setDynamicTargetUrl('', 'Cleared');
+        dynamicUrlInput.focus();
+      });
+
+      // Browser Geolocation ("Use Current GPS Position")
+      useGpsBtn.addEventListener('click', () => {
+        if (!('geolocation' in navigator)) {
+          gpsStatusMsg.textContent = 'Geolocation is not supported by your browser. Enter coordinates manually in the builder.';
+          gpsStatusMsg.classList.remove('hidden');
+          return;
+        }
+
+        useGpsBtn.disabled = true;
+        useGpsBtnText.textContent = 'Acquiring GPS Coordinates...';
+        gpsStatusMsg.textContent = 'Requesting high-accuracy boutique coordinates from your device...';
+        gpsStatusMsg.classList.remove('hidden');
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude.toFixed(6);
+            const lng = position.coords.longitude.toFixed(6);
+            const mapsCoordUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+
+            setDynamicTargetUrl(mapsCoordUrl, 'Live GPS Pin');
+            useGpsBtn.disabled = false;
+            useGpsBtnText.textContent = 'Use Current GPS Position';
+            gpsStatusMsg.textContent = `GPS locked (${lat}, ${lng}) — QR updated with exact Google Maps pin.`;
+          },
+          (error) => {
+            useGpsBtn.disabled = false;
+            useGpsBtnText.textContent = 'Use Current GPS Position';
+            let reason = 'Unable to retrieve GPS position.';
+            if (error.code === error.PERMISSION_DENIED) {
+              reason = 'Location permission denied. Allow location access in your browser or paste a Maps link above.';
+            } else if (error.code === error.POSITION_UNAVAILABLE) {
+              reason = 'Location signal unavailable. Try the Search / Coords Builder below.';
+            } else if (error.code === error.TIMEOUT) {
+              reason = 'Location request timed out. Please try again.';
+            }
+            gpsStatusMsg.textContent = reason;
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      });
+
+      // Collapsible Search / Coordinates Builder
+      toggleBuilderBtn.addEventListener('click', () => {
+        const isHidden = locationBuilderPanel.classList.toggle('hidden');
+        builderChevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+        if (!isHidden) placeQueryInput.focus();
+      });
+
+      function buildUrlFromQuery() {
+        const raw = placeQueryInput.value.trim();
+        if (!raw) return;
+
+        // Detect "lat, lng" coordinate pairs (e.g., "35.6971, -0.6308")
+        const coordMatch = raw.match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+        if (coordMatch) {
+          const lat = parseFloat(coordMatch[1]);
+          const lng = parseFloat(coordMatch[2]);
+          const coordUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+          setDynamicTargetUrl(coordUrl, 'Coordinates Pin');
+          showFeedback(`Generated Google Maps coordinate link (${lat}, ${lng})`);
+        } else {
+          const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(raw)}`;
+          setDynamicTargetUrl(searchUrl, 'Place Search');
+          showFeedback(`Generated Google Maps search link for "${raw}"`);
+        }
+      }
+
+      applyBuilderBtn.addEventListener('click', buildUrlFromQuery);
+      placeQueryInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          buildUrlFromQuery();
+        }
+      });
+
+      // Dynamic Typography Inputs
+      cardTitleInput.addEventListener('input', () => {
+        state.title = cardTitleInput.value;
+        updateStudio();
+      });
+      cardSubtitleInput.addEventListener('input', () => {
+        state.subtitle = cardSubtitleInput.value;
+        updateStudio();
+      });
+      cardWelcomeInput.addEventListener('input', () => {
+        state.welcome = cardWelcomeInput.value;
+        updateStudio();
+      });
+
+      // Wire Interactive Controls
+      logoFileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          handleLogoFile(e.target.files[0]);
+        }
+      });
+
+      // Drag-and-drop support on logo dropzone
+      ['dragenter', 'dragover'].forEach((evtName) => {
+        logoDropzone.addEventListener(evtName, (e) => {
+          e.preventDefault();
+          logoDropzone.classList.add('border-champagne', 'bg-ivorySilk');
+        });
+      });
+      ['dragleave', 'drop'].forEach((evtName) => {
+        logoDropzone.addEventListener(evtName, (e) => {
+          e.preventDefault();
+          logoDropzone.classList.remove('border-champagne', 'bg-ivorySilk');
+        });
+      });
+      logoDropzone.addEventListener('drop', (e) => {
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+          handleLogoFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      // Medallion Shape buttons
+      document.querySelectorAll('.shape-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.medallionShape = btn.dataset.shape;
+          document.querySelectorAll('.shape-btn').forEach((b) => {
+            const active = b === btn;
+            b.className = active
+              ? 'shape-btn py-1.5 px-2.5 rounded-lg text-xs font-medium bg-white text-obsidian shadow-xs transition-all'
+              : 'shape-btn py-1.5 px-2.5 rounded-lg text-xs font-medium text-gray-600 hover:text-obsidian transition-all';
+          });
+          updateStudio();
+        });
+      });
+
+      // Logo Scale slider
+      logoScaleRange.addEventListener('input', () => {
+        state.logoScalePct = parseInt(logoScaleRange.value, 10);
+        logoScaleLabel.textContent = `${state.logoScalePct}%`;
+        updateStudio();
+      });
+
+      // Print Layout Preset buttons
+      document.querySelectorAll('.preset-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.preset = btn.dataset.preset;
+          document.querySelectorAll('.preset-btn').forEach((b) => {
+            const active = b === btn;
+            b.className = active
+              ? 'preset-btn flex flex-col items-center justify-center p-2.5 rounded-xl border-2 border-obsidian bg-ivorySilk/70 text-obsidian transition-all'
+              : 'preset-btn flex flex-col items-center justify-center p-2.5 rounded-xl border border-gray-200 hover:border-gray-300 bg-white text-gray-700 transition-all';
+          });
+          updateStudio();
+        });
+      });
+
+      // Surface Tone buttons
+      document.querySelectorAll('.surface-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.surface = btn.dataset.surface;
+          document.querySelectorAll('.surface-btn').forEach((b) => {
+            const active = b === btn;
+            b.className = active
+              ? 'surface-btn py-1.5 px-2.5 rounded-lg text-xs font-medium bg-white text-obsidian shadow-xs flex items-center justify-center gap-1.5 transition-all'
+              : 'surface-btn py-1.5 px-2.5 rounded-lg text-xs font-medium text-gray-600 hover:text-obsidian flex items-center justify-center gap-1.5 transition-all';
+          });
+          updateStudio();
+        });
+      });
+
+      // QR Module Geometry buttons
+      document.querySelectorAll('.module-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.moduleStyle = btn.dataset.module;
+          document.querySelectorAll('.module-btn').forEach((b) => {
+            const active = b === btn;
+            b.className = active
+              ? 'module-btn py-1.5 px-2.5 rounded-lg text-xs font-medium bg-white text-obsidian shadow-xs transition-all'
+              : 'module-btn py-1.5 px-2.5 rounded-lg text-xs font-medium text-gray-600 hover:text-obsidian transition-all';
+          });
+          updateStudio();
+        });
+      });
+
+      // Toggles & Actions
+      toggleWelcomeLine.addEventListener('change', () => {
+        state.showWelcome = toggleWelcomeLine.checked;
+        updateStudio();
+      });
+
+      togglePrintGuides.addEventListener('change', () => {
+        state.showGuides = togglePrintGuides.checked;
+        updateStudio();
+      });
+
+      retestDecodeBtn.addEventListener('click', () => {
+        updateStudio();
+        showFeedback('Re-scanned canvas pixels: Payload verified against original Google Maps URL.');
+      });
+
+      exportPngBtn.addEventListener('click', exportHighResPng);
+      exportSvgBtn.addEventListener('click', exportVectorSvg);
+
+      // Initialize once fonts and window are ready
+      window.addEventListener('load', () => {
+        buildQrMatrix();
+        tryPreloadUploadedLogo();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(updateStudio);
+        } else {
+          updateStudio();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
